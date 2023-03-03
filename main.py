@@ -49,6 +49,7 @@ class App(QtWidgets.QMainWindow):
         self.ui.giderButton.clicked.connect(self.gider)
         self.ui.clearButton.clicked.connect(self.db.clear)
         self.ui.showDBButton.clicked.connect(self.showDB)
+        self.hesapla()
     def gelir(self):
         self.db.insert(self.ui.dateLabel.text(), 1, self.ui.gelirBox.text())
         self.ui.gelirBox.clear()
