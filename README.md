@@ -1,4 +1,4 @@
-###Gelir Gider Hesaplayici
+## Gelir Gider Hesaplayici
 
 - Aylik gelir ve giderleri hesaplamak icin tasarlanmis basit program, istediginiz gibi kullanabilirsiniz.
 
