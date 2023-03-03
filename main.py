@@ -12,7 +12,19 @@ class Main():
     def __init__(self):
         self.db = Database()
 
-
+class App(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(App, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.setWindowTitle('codedby:fiverr/linuxkerem')
+        self.ui.addAccount.clicked.connect(self.addAccount)
+        self.ui.addMultipleAccount.clicked.connect(self.addMultipleAccount)
+        self.ui.addAccountGmailTab.clicked.connect(self.addGmailAccount)
+        self.ui.addProxysProxyTab.clicked.connect(self.addProxys)
+        self.ui.addGmailsButton.clicked.connect(self.addGmails)
+        self.ui.addAccountProxyTab.clicked.connect(self.addProxyAccount)
+        self.ui.startButton.clicked.connect(self.start)
 
 conn = sqlite3.connect('test.db')
 print("Database opened successfully")
