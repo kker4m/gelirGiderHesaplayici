@@ -31,7 +31,7 @@ class dbWindow(QMainWindow):
         self.view.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.setCentralWidget(self.view)
         self.db = Database()
-        self.db.c.execute("SELECT * FROM main")
+        self.db.c.execute("SELECT * FROM main ORDER BY tarih DESC,kategori;")
         self.data = self.db.c.fetchall()
         self.view.setRowCount(len(self.data))
         for i in range(len(self.data)):
@@ -71,14 +71,15 @@ class App(QtWidgets.QMainWindow):
         self.ui.kategoriBox.setCurrentIndex(0)
         self.hesapla()
     def hesapla(self):
-        gider = 0
-        gelir = 0
-        giderler = self.db.c.execute("SELECT miktar FROM main WHERE miktar < 0 AND tarih LIKE '%{}%'".format(self.ui.dateLabel.text().split('-')[1]))
+        tarih = self.ui.dateLabel.text().split('-')
+        tarih = tarih[0] + '-' + tarih[1]
+        gelir, gider = 0,0
+        giderler = self.db.c.execute("SELECT miktar FROM main WHERE miktar < 0 AND tarih LIKE '%{}%'".format(tarih))
         for i in giderler:
             try:
                 gider += i[0]
             except: pass
-        gelirler = self.db.c.execute("SELECT miktar FROM main WHERE miktar > 0 AND tarih LIKE '%{}%'".format(self.ui.dateLabel.text().split('-')[1]))
+        gelirler = self.db.c.execute("SELECT miktar FROM main WHERE miktar > 0 AND tarih LIKE '%{}%'".format(tarih))
         for i in gelirler:
             try:
                 gelir += i[0]
