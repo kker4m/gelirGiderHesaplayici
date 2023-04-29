@@ -4,15 +4,16 @@ class Database():
     def __init__(self):
         self.conn = sqlite3.connect('logs.db')
         self.c = self.conn.cursor()
-        self.c.execute("CREATE TABLE IF NOT EXISTS main (id INTEGER PRIMARY KEY, date TEXT, type INTEGER, amount REAL)")
+        self.c.execute("CREATE TABLE IF NOT EXISTS main (tarih TEXT, miktar INT, aciklama LONGTEXT, kategori )")
         self.conn.commit()
-    def insert(self, date, type, amount):
-        self.c.execute("INSERT INTO main (date, type, amount) VALUES (?, ?, ?)", (date, type, amount))
+    def insert(self, tarih, miktar,description='',kategori="Belirtilmemis"):
+        self.c.execute("INSERT INTO main(tarih, miktar, aciklama, kategori ) VALUES (?, ?, ?, ?)", (tarih, miktar,description,kategori))
         self.conn.commit()
     def clear(self):
         self.c.execute("DELETE FROM main;")
         self.conn.commit()
         print("Veritabanı temizlendi.")
+
 class dbWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -20,7 +21,7 @@ class dbWindow(QMainWindow):
         self.resize(450, 250)
         self.view = QTableWidget()
         self.view.setColumnCount(4)
-        self.view.setHorizontalHeaderLabels(["ID", "Date", "Type", "Amount"])
+        self.view.setHorizontalHeaderLabels(["Tarih", "Miktar","Aciklama","Kategori"])
         self.view.setEditTriggers(QTableWidget.NoEditTriggers)
         self.view.setSelectionBehavior(QTableWidget.SelectRows)
         self.view.setSelectionMode(QTableWidget.SingleSelection)
@@ -37,36 +38,51 @@ class dbWindow(QMainWindow):
             for j in range(4):
                 self.view.setItem(i, j, QTableWidgetItem(str(self.data[i][j])))
         self.show()
+
+
 class App(QtWidgets.QMainWindow):
     def __init__(self):
         super(App, self).__init__()
         self.db = Database()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
+        self.setFixedWidth(713)
+        self.setFixedHeight(277)
         self.setWindowTitle('codedby:github/linuxkerem')
         self.ui.dateLabel.setText(str(datetime.datetime.now()).split()[0])
-        self.ui.gelirButton.clicked.connect(self.gelir)
-        self.ui.giderButton.clicked.connect(self.gider)
-        self.ui.clearButton.clicked.connect(self.db.clear)
+        self.ui.gelirButton.clicked.connect(self.bakiyeEkle)
+        self.ui.clearButton.clicked.connect(self.veritabininiTemizle)
         self.ui.showDBButton.clicked.connect(self.showDB)
         self.hesapla()
-    def gelir(self):
-        self.db.insert(self.ui.dateLabel.text(), 1, self.ui.gelirBox.text())
+
+    def veritabininiTemizle(self):
+        reply = QMessageBox.warning(self, 'Dikkat', 'Tum verilerinizi silmek istediginizden emin misiniz ?',QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.db.clear()
+            self.ui.resultLabel.setText("Bu ay ki geliriniz: 0" )
+    def bakiyeEkle(self):
+        kategori = self.ui.kategoriBox.currentText()
+        if kategori == "Belirtilmemis" and len(self.ui.ozelKategori.text()) != 0:
+            kategori = self.ui.ozelKategori.text
+        self.db.insert(self.ui.dateLabel.text(),self.ui.gelirBox.text(),self.ui.aciklama.text(),kategori)
         self.ui.gelirBox.clear()
-        self.hesapla()
-    def gider(self):
-        self.db.insert(self.ui.dateLabel.text(), 0, self.ui.giderBox.text())
-        self.ui.giderBox.clear()
+        self.ui.aciklama.clear()
+        self.ui.ozelKategori.clear()
+        self.ui.kategoriBox.setCurrentIndex(0)
         self.hesapla()
     def hesapla(self):
         gider = 0
         gelir = 0
-        giderler = self.db.c.execute("SELECT amount FROM main WHERE type=0 AND date LIKE '%{}%'".format(self.ui.dateLabel.text().split('-')[1]))
+        giderler = self.db.c.execute("SELECT miktar FROM main WHERE miktar < 0 AND tarih LIKE '%{}%'".format(self.ui.dateLabel.text().split('-')[1]))
         for i in giderler:
-            gider += i[0]
-        gelirler = self.db.c.execute("SELECT amount FROM main WHERE type=1 AND date LIKE '%{}%'".format(self.ui.dateLabel.text().split('-')[1]))
+            try:
+                gider += i[0]
+            except: pass
+        gelirler = self.db.c.execute("SELECT miktar FROM main WHERE miktar > 0 AND tarih LIKE '%{}%'".format(self.ui.dateLabel.text().split('-')[1]))
         for i in gelirler:
-            gelir += i[0]
+            try:
+                gelir += i[0]
+            except: pass
         self.ui.resultLabel.setText("Bu ay ki geliriniz: " + str(int(gelir-gider)))
 
     def showDB(self):
