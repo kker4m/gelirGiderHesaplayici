@@ -4,7 +4,7 @@ class Database():
     def __init__(self):
         self.conn = sqlite3.connect('logs.db')
         self.c = self.conn.cursor()
-        self.c.execute("CREATE TABLE IF NOT EXISTS main (tarih TEXT, miktar INT, aciklama LONGTEXT, kategori )")
+        self.c.execute("CREATE TABLE IF NOT EXISTS main (tarih TEXT, miktar INT, aciklama LONGTEXT, kategori varchar(400))")
         self.conn.commit()
     def insert(self, tarih, miktar,description='',kategori="Belirtilmemis"):
         self.c.execute("INSERT INTO main(tarih, miktar, aciklama, kategori ) VALUES (?, ?, ?, ?)", (tarih, miktar,description,kategori))
@@ -63,7 +63,7 @@ class App(QtWidgets.QMainWindow):
     def bakiyeEkle(self):
         kategori = self.ui.kategoriBox.currentText()
         if kategori == "Belirtilmemis" and len(self.ui.ozelKategori.text()) != 0:
-            kategori = self.ui.ozelKategori.text
+            kategori = self.ui.ozelKategori.text()
         self.db.insert(self.ui.dateLabel.text(),self.ui.gelirBox.text(),self.ui.aciklama.text(),kategori)
         self.ui.gelirBox.clear()
         self.ui.aciklama.clear()
