@@ -9,4 +9,4 @@
 
 ### Gorsel
 
-<img src = 'https://github.com/linuxkerem/gelirGiderHesaplayici/blob/main/images/arayuz.png' alt = 'Arayuz gorseli' width='500'/>
+<img src = 'https://github.com/linuxkerem/gelirGiderHesaplayici/blob/main/images/arayuz.png' alt = 'Arayuz gorseli' width='750'/>
