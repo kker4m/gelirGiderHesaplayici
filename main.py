@@ -77,14 +77,15 @@ class App(QtWidgets.QMainWindow):
         giderler = self.db.c.execute("SELECT miktar FROM main WHERE miktar < 0 AND tarih LIKE '%{}%'".format(tarih))
         for i in giderler:
             try:
-                gider += i[0]
-            except: pass
+                gider += int(i[0])
+            except Exception as e:
+                print(e)
         gelirler = self.db.c.execute("SELECT miktar FROM main WHERE miktar > 0 AND tarih LIKE '%{}%'".format(tarih))
         for i in gelirler:
             try:
                 gelir += i[0]
             except: pass
-        self.ui.resultLabel.setText("Bu ay ki geliriniz: " + str(int(gelir-gider)))
+        self.ui.resultLabel.setText("Bu ay ki geliriniz: " + str(int(gelir+gider)))
 
     def showDB(self):
         self.dbWindow = dbWindow()
